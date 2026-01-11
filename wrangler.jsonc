@@ -7,8 +7,8 @@
   // 自定义域名 / Routes（来自云端）
   "routes": [
     {
-      "pattern": "warden.2x.nz",
-      "zone_name": "2x.nz"
+      "pattern": "auth.sasovo.top",
+      "zone_name": "sasovo.top"
       // jsonc 里不需要 custom_domain: true
       // 只要是 apex / 自定义域名，Cloudflare 会自动识别
     }
@@ -18,7 +18,7 @@
   "d1_databases": [
     {
       "binding": "vault1",
-      "database_id": "d4e07248-2f73-4edb-915d-8ec1a7991c88"
+      "database_id": "d26145ce-4ea0-4f02-a7b1-889fb23ab7c2"
       // database_name 可选，但建议写上以增强可读性
       // "database_name": "vault1"
     }
