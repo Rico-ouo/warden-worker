@@ -1,6 +1,7 @@
 use axum::{
     routing::{get, post, put, delete},
     Router,
+    response::Html,
 };
 use std::sync::Arc;
 use worker::Env;
@@ -11,6 +12,7 @@ pub fn api_router(env: Env) -> Router {
     let app_state = Arc::new(env);
 
     Router::new()
+        .route("/", get(|| async { Html(include_str!("../static/index.html")) }))
         // Identity/Auth routes
         .route("/identity/accounts/prelogin", post(accounts::prelogin))
         .route(
@@ -22,10 +24,13 @@ pub fn api_router(env: Env) -> Router {
             "/identity/accounts/register/send-verification-email",
             post(accounts::send_verification_email),
         )
+        .route("/api/accounts/profile", get(accounts::profile))
+        .route("/api/accounts/revision-date", get(accounts::revision_date))
         // Main data sync route
         .route("/api/sync", get(sync::get_sync_data))
         // Ciphers CRUD
         .route("/api/ciphers/create", post(ciphers::create_cipher))
+        .route("/api/ciphers", post(ciphers::post_ciphers))
         .route("/api/ciphers/import", post(import::import_data))
         .route("/api/ciphers/{id}", put(ciphers::update_cipher))
         .route("/api/ciphers/{id}/delete", put(ciphers::delete_cipher))

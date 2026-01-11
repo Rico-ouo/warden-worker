@@ -6,6 +6,10 @@ authors = ["deepubuntu"]
 
 [package.metadata.release]
 release = false
+wasm-opt = false
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
 
 [lib]
 crate-type = ["cdylib"]
