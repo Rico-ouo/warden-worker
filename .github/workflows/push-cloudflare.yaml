@@ -1,0 +1,46 @@
+name: Deploy to Cloudflare Workers
+
+on:
+    push:
+        branches: [main, uat, release*]
+    pull_request_target:
+        branches: [main, uat, release*]
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        name: Deploy to Cloudflare Workers
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            # Install Rust toolchain
+            - run: rustup toolchain install stable --profile minimal
+            - run: rustup target add wasm32-unknown-unknown
+            - name: Install lld and other build tools
+              run: sudo apt install -y lld clang gcc llvm
+
+            # Install worker-build if not already present
+            - name: Install worker-build
+              run: |
+                  if ! command -v worker-build &> /dev/null; then
+                    cargo install worker-build
+                  fi
+
+            # Update database_id in wrangler.jsonc
+            - name: Replace database_id in wrangler.jsonc
+              run: |
+                  # Use sed to replace the template variable with the actual database_id from secrets
+                  sed -i "s/\"database_id\": \"\${D1_DATABASE_ID}\"/\"database_id\": \"${{ secrets.D1_DATABASE_ID }}\"/g" wrangler.jsonc
+                  # Print the updated file to verify the change
+                  cat wrangler.jsonc
+
+            # Deploy using Wrangler Action
+            - uses: cloudflare/wrangler-action@v3
+              id: cf
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command: deploy
+                  workingDirectory: .
